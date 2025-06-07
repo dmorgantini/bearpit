@@ -32,12 +32,12 @@ class TournamentSimulator {
     this.retiredCount = 0; // Track how many have retired
   }
 
-  // NEW: Check if retirements are still allowed
+  // Check if retirements are still allowed
   canRetire() {
     return this.retiredCount < this.config.maxRetirements;
   }
 
-  // NEW: Handle retirement and update count
+  // Handle retirement and update count
   retireFighter(fighter, currentTime) {
     if (this.canRetire()) {
       fighter.retire(currentTime);
@@ -45,6 +45,82 @@ class TournamentSimulator {
       return true;
     }
     return false;
+  }
+
+  // NEW: Analyze award eligibility and eliminations
+  analyzeAwardEliminations() {
+    const fighterStats = this.fighters;
+    
+    const analysis = {
+      totalEliminations: fighterStats.reduce((sum, f) => sum + f.totalLosses + f.totalSimuls, 0),
+      eliminationsByAwardWinners: fighterStats.reduce((sum, f) => sum + f.eliminatedByAwardWinner, 0),
+      eliminationsWhileAwardWinner: fighterStats.reduce((sum, f) => sum + f.eliminationsWhileAwardWinner, 0),
+      
+      // Award eligibility analysis
+      totalFighters: fighterStats.length,
+      eligibleFighters: 0,
+      ineligibleFighters: 0,
+      awardWinners: 0,
+      eligibleButDidntWin: 0,
+      
+      // Breakdown by fighter level
+      eliminationsByLevel: {},
+      
+      // Fighters most affected
+      mostAffectedFighters: fighterStats
+        .filter(f => f.eliminatedByAwardWinner > 0)
+        .sort((a, b) => b.eliminatedByAwardWinner - a.eliminatedByAwardWinner)
+        .slice(0, 5)
+        .map(f => ({
+          name: f.name,
+          level: f.level,
+          eliminatedByAwardWinner: f.eliminatedByAwardWinner,
+          totalEliminations: f.totalLosses + f.totalSimuls,
+          eliminationRate: f.getEliminationByAwardWinnerRate()
+        }))
+    };
+
+    // Analyze award eligibility
+    fighterStats.forEach(fighter => {
+      const status = fighter.getAwardEligibilityStatus(this.config.retirementStreakLength);
+      
+      if (status.canEarnAward) {
+        analysis.eligibleFighters++;
+        if (status.earnedAward) {
+          analysis.awardWinners++;
+        } else {
+          analysis.eligibleButDidntWin++;
+        }
+      } else {
+        analysis.ineligibleFighters++;
+      }
+    });
+
+    // Calculate rates
+    analysis.awardWinnerEliminationRate = analysis.totalEliminations > 0 ? 
+      (analysis.eliminationsByAwardWinners / analysis.totalEliminations) * 100 : 0;
+    
+    analysis.eligibilityRate = (analysis.eligibleFighters / analysis.totalFighters) * 100;
+    analysis.awardSuccessRate = analysis.eligibleFighters > 0 ? 
+      (analysis.awardWinners / analysis.eligibleFighters) * 100 : 0;
+
+    // Breakdown by level
+    for (let level = 1; level <= 10; level++) {
+      const fightersAtLevel = fighterStats.filter(f => f.level === level);
+      if (fightersAtLevel.length > 0) {
+        const levelEliminations = fightersAtLevel.reduce((sum, f) => sum + f.totalLosses + f.totalSimuls, 0);
+        const levelEliminationsByAwardWinners = fightersAtLevel.reduce((sum, f) => sum + f.eliminatedByAwardWinner, 0);
+        
+        analysis.eliminationsByLevel[level] = {
+          totalFighters: fightersAtLevel.length,
+          totalEliminations: levelEliminations,
+          eliminationsByAwardWinners: levelEliminationsByAwardWinners,
+          eliminationRate: levelEliminations > 0 ? (levelEliminationsByAwardWinners / levelEliminations) * 100 : 0
+        };
+      }
+    }
+
+    return analysis;
   }
 
   // Centralized sorting logic for tournament placements
@@ -119,7 +195,12 @@ class TournamentSimulator {
       retiredAfterFights: fighter.retiredAfterFights,
       efficiency: this.config.retirementStreakLength && fighter.isRetired && fighter.retiredAfterFights > 0 ? 
         (fighter.longestStreak / fighter.retiredAfterFights * 100) : // Streak per fight ratio for retirement mode
-        (fighter.totalFights > 0 ? (fighter.totalWins / fighter.totalFights * 100) : 0) // Win rate as efficiency for traditional mode
+        (fighter.totalFights > 0 ? (fighter.totalWins / fighter.totalFights * 100) : 0), // Win rate as efficiency for traditional mode
+      // NEW: Award tracking
+      earnedAward: fighter.earnedAward,
+      eliminatedByAwardWinner: fighter.eliminatedByAwardWinner,
+      eliminationsWhileAwardWinner: fighter.eliminationsWhileAwardWinner,
+      eliminationByAwardWinnerRate: fighter.getEliminationByAwardWinnerRate()
     }));
   }
 
@@ -232,7 +313,7 @@ class TournamentSimulator {
     // Collect results
     const pitResults = pits.map(pit => pit.getResult());
     
-    // NEW: Find overall winner based on retirement system
+    // Find overall winner based on retirement system
     let overallWinner = null;
     
     if (this.config.retirementStreakLength) {
@@ -277,6 +358,9 @@ class TournamentSimulator {
         console.log(`  Champion: ${result.champion.name} (Level ${result.champion.level}, Streak: ${result.champion.currentStreak})`);
       }
     });
+
+    // NEW: Generate award elimination analysis
+    const awardAnalysis = this.analyzeAwardEliminations();
     
     return {
       pitResults: pitResults,
@@ -290,7 +374,8 @@ class TournamentSimulator {
         timeInPit: overallWinner.timeInPit,
         isRetired: overallWinner.isRetired,
         retiredAt: overallWinner.retiredAt,
-        retiredAfterFights: overallWinner.retiredAfterFights
+        retiredAfterFights: overallWinner.retiredAfterFights,
+        earnedAward: overallWinner.earnedAward
       } : null,
       roundDuration: this.config.roundDurationMinutes,
       totalFights: pitResults.reduce((sum, result) => sum + result.totalFights, 0),
@@ -301,12 +386,14 @@ class TournamentSimulator {
         level: f.level,
         retiredAt: f.retiredAt,
         retiredAfterFights: f.retiredAfterFights,
-        streakAchieved: this.config.retirementStreakLength
+        streakAchieved: this.config.retirementStreakLength,
+        earnedAward: f.earnedAward
       })),
       retiredCount: this.retiredCount,
       maxRetirements: this.config.maxRetirements,
-      topFourFighters: this.getTopFourFighters(), // NEW: Include top 4 for fairness analysis
-      tournamentPlacements: this.getAllTournamentPlacements(), // NEW: Include all placements
+      topFourFighters: this.getTopFourFighters(),
+      tournamentPlacements: this.getAllTournamentPlacements(),
+      awardAnalysis: awardAnalysis, // NEW: Award and elimination analysis
       fighterStats: this.fighters.map(f => ({
         name: f.name,
         level: f.level,
@@ -323,7 +410,14 @@ class TournamentSimulator {
         currentPitId: f.currentPitId,
         isRetired: f.isRetired,
         retiredAt: f.retiredAt,
-        retiredAfterFights: f.retiredAfterFights
+        retiredAfterFights: f.retiredAfterFights,
+        // NEW: Award tracking
+        earnedAward: f.earnedAward,
+        awardThreshold: f.getAwardThreshold(),
+        canEarnAward: f.canEarnAward(this.config.retirementStreakLength),
+        eliminatedByAwardWinner: f.eliminatedByAwardWinner,
+        eliminationsWhileAwardWinner: f.eliminationsWhileAwardWinner,
+        eliminationByAwardWinnerRate: f.getEliminationByAwardWinnerRate()
       }))
     };
   }

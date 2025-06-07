@@ -2,10 +2,10 @@ import TournamentSimulator from "./tournament-simulator.js";
 
 const retirementConfig = {
   fighters: [
-    { name: 'Dusk', level: 6 },
-    { name: 'Fang', level: 7 },
-    { name: 'Corsi', level: 8 },
-    { name: 'Possum', level: 3 },
+    { name: 'Dusk', level: 3 },
+    { name: 'Fang', level: 2 },
+    { name: 'Corsi', level: 2 },
+    { name: 'Possum', level: 1 },
     { name: 'Synergy', level: 3 },
     { name: 'Aqua', level: 2 },
     { name: 'Silver', level: 3 },
@@ -24,8 +24,8 @@ const retirementConfig = {
   averageFightDurationSeconds: 30,
   fightDurationVariance: 10,
   restPeriodSeconds: 30,
-  retirementStreakLength: 'auto', // NEW: Retire after 5 wins
-  maxRetirements: 3, // NEW: Only first 3 to reach streak can retire
+  retirementStreakLength: null,
+  maxRetirements: 3,
 };
 
 function runTournamentExample(config) {
@@ -109,11 +109,41 @@ function runTournamentExample(config) {
     const medal = index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : '🏅';
     const retiredInfo = fighter.isRetired ? ` [RETIRED@${fighter.retiredAt.toFixed(1)}m]` : '';
     const efficiencyInfo = fighter.efficiency !== null ? ` (Eff: ${fighter.efficiency.toFixed(1)}${fighter.isRetired ? '% streak/fight' : '% win rate'})` : '';
+    const awardInfo = fighter.earnedAward ? ' 🏆' : '';
     
-    console.log(`  ${medal} ${fighter.rank}. ${fighter.name} (Level ${fighter.level})`);
+    console.log(`  ${medal} ${fighter.rank}. ${fighter.name} (Level ${fighter.level})${awardInfo}`);
     console.log(`      Streak: ${fighter.longestStreak} | W/L/S: ${fighter.totalWins}/${fighter.totalLosses}/${fighter.totalSimuls} | Fights: ${fighter.totalFights}`);
     console.log(`      Win Rate: ${fighter.winRate.toFixed(1)}% | Unlucky: ${fighter.unluckyPercentage.toFixed(1)}% | Time: ${fighter.timeInPit.toFixed(1)}m${retiredInfo}${efficiencyInfo}`);
+    
+    // NEW: Show award elimination stats if relevant
+    if (fighter.eliminatedByAwardWinner > 0 || fighter.eliminationsWhileAwardWinner > 0) {
+      console.log(`      📊 Award Impact: Eliminated by award winners ${fighter.eliminatedByAwardWinner} times (${fighter.eliminationByAwardWinnerRate.toFixed(1)}%), ` +
+                 `eliminated others while award winner ${fighter.eliminationsWhileAwardWinner} times`);
+    }
   });
+  
+  // NEW: Show award analysis if available
+  if (results.awardAnalysis) {
+    console.log(`\n🏆 AWARD SYSTEM ANALYSIS:`);
+    console.log(`  Award Eligibility: ${results.awardAnalysis.eligibleFighters}/${results.awardAnalysis.totalFighters} fighters eligible (${results.awardAnalysis.eligibilityRate.toFixed(1)}%)`);
+    console.log(`  Award Winners: ${results.awardAnalysis.awardWinners} fighters earned awards (${results.awardAnalysis.awardSuccessRate.toFixed(1)}% success rate)`);
+    console.log(`  Eliminations by Award Winners: ${results.awardAnalysis.eliminationsByAwardWinners}/${results.awardAnalysis.totalEliminations} (${results.awardAnalysis.awardWinnerEliminationRate.toFixed(1)}%)`);
+    
+    if (results.awardAnalysis.mostAffectedFighters.length > 0) {
+      console.log(`\n  Most Affected by Award Winners:`);
+      results.awardAnalysis.mostAffectedFighters.forEach((fighter, index) => {
+        console.log(`    ${index + 1}. ${fighter.name} (Level ${fighter.level}) - ${fighter.eliminatedByAwardWinner}/${fighter.totalEliminations} eliminations (${fighter.eliminationRate.toFixed(1)}%)`);
+      });
+    }
+    
+    // Show level-based patterns
+    console.log(`\n  Elimination Rates by Level:`);
+    Object.entries(results.awardAnalysis.eliminationsByLevel)
+      .sort(([a], [b]) => parseInt(a) - parseInt(b))
+      .forEach(([level, data]) => {
+        console.log(`    Level ${level}: ${data.eliminationsByAwardWinners}/${data.totalEliminations} eliminations by award winners (${data.eliminationRate.toFixed(1)}%)`);
+      });
+  }
   
   // Show top performers (existing display)
   const topPerformers = config.retirementStreakLength ? 
@@ -131,8 +161,9 @@ function runTournamentExample(config) {
   topPerformers.forEach((fighter, index) => {
     const retiredInfo = fighter.isRetired ? ` 🏁(${fighter.retiredAfterFights}F@${fighter.retiredAt.toFixed(1)}m)` : '';
     const blockedInfo = !fighter.isRetired && config.retirementStreakLength && fighter.longestStreak >= config.retirementStreakLength ? ' ⚠️(blocked)' : '';
+    const awardInfo = fighter.earnedAward ? ' 🏆' : '';
     console.log(`  ${index + 1}. ${fighter.name} (Level ${fighter.level}) - Streak: ${fighter.longestStreak}, ` +
-      `W/L/S: ${fighter.totalWins}/${fighter.totalLosses}/${fighter.totalSimuls}${retiredInfo}${blockedInfo} ` +
+      `W/L/S: ${fighter.totalWins}/${fighter.totalLosses}/${fighter.totalSimuls}${retiredInfo}${blockedInfo}${awardInfo} ` +
       `Unlucky: ${fighter.unluckyPercentage}% Total Fights: ${fighter.totalFights}`);
   });
   

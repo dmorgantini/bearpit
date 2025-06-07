@@ -156,8 +156,8 @@ export class BearPit {
       winner = fighter1;
       loser = fighter2;
 
-      winner.win(fightDuration); // This records time as champion
-      loser.lose();
+      winner.win(fightDuration, loser);
+      loser.lose(winner);
 
       this.currentChampion = winner;
       winner.isChampion = true;
@@ -170,8 +170,8 @@ export class BearPit {
       winner = fighter2;
       loser = fighter1;
 
-      winner.win(fightDuration); // This records time as champion
-      loser.lose();
+      winner.win(fightDuration, loser);
+      loser.lose(winner);
 
       this.currentChampion = winner;
       winner.isChampion = true;
@@ -181,8 +181,8 @@ export class BearPit {
     } else {
       // Simul - both fighters die
       outcome = 'simul';
-      fighter1.simul();
-      fighter2.simul();
+      fighter1.simul(fighter2); // FIXED: Pass opponent for award tracking
+      fighter2.simul(fighter1); // FIXED: Pass opponent for award tracking
 
       this.currentChampion = null;
       this.totalSimuls++;
@@ -257,6 +257,22 @@ export class BearPit {
       duration: this.elapsedTime,
       fights: this.fights,
       isActive: this.isActive
+    };
+  }
+
+  getCurrentStatus() {
+    return {
+      pitId: this.pitId,
+      elapsedTime: this.elapsedTime.toFixed(1),
+      isActive: this.isActive,
+      champion: this.currentChampion ? {
+        name: this.currentChampion.name,
+        level: this.currentChampion.level,
+        streak: this.currentChampion.currentStreak
+      } : 'None',
+      totalFights: this.totalFights,
+      averageFightDuration: this.totalFights > 0 ? 
+        (this.fights.reduce((sum, fight) => sum + parseFloat(fight.duration), 0) / this.totalFights).toFixed(1) + 's' : 'N/A'
     };
   }
 }
