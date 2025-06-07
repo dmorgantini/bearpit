@@ -29,24 +29,19 @@ A sophisticated JavaScript simulation system for bear pit style tournaments comm
 - Performance correlation with skill levels
 - Tournament configuration optimization tools
 
-## 📦 Installation
-```
-bash git clone <repository-url> cd bearpit npm install
-``` 
-
 ## 🚀 Quick Start
 
 ### Basic Usage
 ```
 javascript import TournamentSimulator from "./tournament-simulator.js";
 const config = { fighters: [ { name: 'Fighter1', level: 5 }, { name: 'Fighter2', level: 7 }, { name: 'Fighter3', level: 3 }, // ... more fighters ], numberOfPits: 2, roundDurationMinutes: 15, skillMultiplier: 3.0, fatigueMultiplier: 0.001 };
-const simulator = new TournamentSimulator(config); const results = simulator.runRound();
-latex_unknown_tag
+const simulator = new TournamentSimulator(config); 
+const results = simulator.runRound();
 ``` 
 
 ### Run the Example
 ```
-bash node index.js
+node index.js
 ``` 
 
 ## ⚙️ Configuration Options
@@ -83,7 +78,12 @@ javascript const traditionalConfig = { fighters: [...], roundDurationMinutes: 15
 ### Retirement Race Mode
 Competitive format where the first fighters to reach a target streak retire and place in order.
 ```
-javascript const retirementConfig = { fighters: [...], retirementStreakLength: 5, // or 'auto' for level-based maxRetirements: 3, roundDurationMinutes: 20 };
+javascript const retirementConfig = { 
+                                      fighters: [...],
+                                      retirementStreakLength: 5, // or 'auto' for level-based
+                                      maxRetirements: 3,
+                                      roundDurationMinutes: 20
+                                     };
 ``` 
 
 ## 📊 Analytics & Fairness Analysis
@@ -91,7 +91,8 @@ javascript const retirementConfig = { fighters: [...], retirementStreakLength: 5
 The simulator includes comprehensive analytics tools for tournament fairness analysis:
 ```
 javascript import { FairnessAnalyzer } from "./fairness-analyzer.js";
-const analyzer = new FairnessAnalyzer(fighterList, null, baseConfig); const results = analyzer.analyzeFairness( [10, 15, 20], // time options [1, 2, 3], // pit options [false], // queue strategies 50 // iterations );
+const analyzer = new FairnessAnalyzer(fighterList, null, baseConfig); 
+const results = analyzer.analyzeFairness( [10, 15, 20], // time options [1, 2, 3], // pit options [false], // queue strategies 50 // iterations );
 latex_unknown_tag
 ``` 
 
@@ -103,13 +104,33 @@ latex_unknown_tag
 
 ## 🛠️ Project Structure
 ```
-bearpit/ ├── tournament-simulator.js # Main tournament simulation engine ├── bear-pit.js # Individual bear pit logic ├── fighter.js # Fighter class with stats tracking ├── queue-manager.js # Fighter queue management ├── fairness-analyzer.js # Tournament fairness analysis ├── distributions.js # Fighter level distributions ├── fairness_analysis_runner.js # Batch analysis tools ├── index.js # Example usage └── package.json # Project configuration
+bearpit/ 
+    ├── tournament-simulator.js # Main tournament simulation engine 
+    ├── bear-pit.js # Individual bear pit logic 
+    ├── fighter.js # Fighter class with stats tracking 
+    ├── queue-manager.js # Fighter queue management 
+    ├── fairness-analyzer.js # Tournament fairness analysis 
+    ├── distributions.js # Fighter level distributions 
+    ├── fairness_analysis_runner.js # Batch analysis tools 
+    ├── index.js # Example usage 
+    └── package.json # Project configuration
 ``` 
 
 ## 📈 Example Output
 ```
-=== TOURNAMENT ROUND STARTING === Fighters: 11 Pits: 2 Round Duration: 10 minutes Queue Strategy: Single shared queue Skill Multiplier: 3x per level Fatigue Multiplier: 0.001 per streak 🏆 Retirement Streak: First 3 fighters to reach 13 wins retire
-🏆 TOURNAMENT WINNER: Corsi (Level 8) 🏁 First to reach 13 wins! ⏱️ Retirement Time: 7.2 minutes ⚔️ Fights to Victory: 15 📊 Final Stats: 13W/2L/0S
+=== TOURNAMENT ROUND STARTING === 
+Fighters: 11 
+Pits: 2 
+Round Duration: 10 minutes 
+Queue Strategy: Single shared queue 
+Skill Multiplier: 3x per level 
+Fatigue Multiplier: 0.001 per streak 
+🏆 Retirement Streak: First 3 fighters to reach 13 wins retire
+🏆 TOURNAMENT WINNER: Corsi (Level 8) 
+🏁 First to reach 13 wins! 
+⏱️ Retirement Time: 7.2 minutes 
+⚔️ Fights to Victory: 15
+📊 Final Stats: 13W/2L/0S
 ``` 
 
 ## 🎮 Realistic Boffer Mechanics
