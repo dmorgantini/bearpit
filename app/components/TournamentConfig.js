@@ -86,7 +86,7 @@ function TournamentConfig({ onConfigChange, onRunTournament }) {
                 <CFormInput
                   type="number"
                   min="1"
-                  max="5"
+                  max={Math.floor(fighters.length / 2)}
                   value={config.numberOfPits}
                   onChange={(e) => handleConfigChange('numberOfPits', parseInt(e.target.value))}
                 />
