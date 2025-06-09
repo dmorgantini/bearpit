@@ -1,13 +1,42 @@
 {
   "name": "bearpit",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "Boffer Foam Tournament Simulator with React Frontend",
+  "main": "lib/index.js",
   "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "export": "next export",
+    "heroku-postbuild": "npm run build",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "keywords": [],
+  "keywords": [
+    "boffer",
+    "tournament",
+    "simulator",
+    "react"
+  ],
   "author": "",
   "license": "ISC",
-  "type": "module"
+  "type": "module",
+  "dependencies": {
+    "@coreui/coreui": "^4.2.6",
+    "@coreui/icons": "^3.0.1",
+    "@coreui/icons-react": "^2.1.0",
+    "@coreui/react": "^4.9.0",
+    "bootstrap": "^5.3.6",
+    "chart.js": "^4.4.0",
+    "next": "^14.0.0",
+    "react": "^18.2.0",
+    "react-chartjs-2": "^5.2.0",
+    "react-dom": "^18.2.0"
+  },
+  "devDependencies": {
+    "eslint": "^8.50.0",
+    "eslint-config-next": "^14.0.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
 }

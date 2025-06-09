@@ -41,7 +41,7 @@ const results = simulator.runRound();
 
 ### Run the Example
 ```
-node index.js
+node constants.js
 ``` 
 
 ## ⚙️ Configuration Options
@@ -112,7 +112,7 @@ bearpit/
     ├── fairness-analyzer.js # Tournament fairness analysis 
     ├── distributions.js # Fighter level distributions 
     ├── fairness_analysis_runner.js # Batch analysis tools 
-    ├── index.js # Example usage 
+    ├── constants.js # Example usage 
     └── package.json # Project configuration
 ``` 
 
