@@ -13,19 +13,3 @@ export const DEFAULT_CONFIG = {
   retirementStreakLength: null,
   maxRetirements: 3,
 };
-
-export const TOURNAMENT_MODES = {
-  TRADITIONAL: 'traditional',
-  RETIREMENT_RACE: 'retirement_race',
-};
-
-export const FIGHTER_LEVELS = {
-  MIN: 1,
-  MAX: 10,
-};
-
-export const OUTCOMES = {
-  WIN: 'win',
-  LOSS: 'loss',
-  SIMUL: 'simul',
-};
