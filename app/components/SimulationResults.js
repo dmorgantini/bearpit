@@ -1,6 +1,7 @@
 import React from 'react';
 import { CCard, CCardBody, CCardHeader, CTable, CTableHead, CTableBody, CTableRow, CTableHeaderCell, CTableDataCell, CBadge, CCol, CRow } from '@coreui/react';
 import { formatTime, formatPercentage } from '../../utils/helpers.js';
+import LogModal from "./LogModal.jsx";
 
 export default function SimulationResults({ results }) {
   if (!results) {
@@ -28,6 +29,8 @@ export default function SimulationResults({ results }) {
 
   return (
     <div>
+      <LogModal />
+
       {/* Tournament Winner Section */}
       {results.overallWinner && (
         <CCard className="mb-3">
@@ -102,7 +105,7 @@ export default function SimulationResults({ results }) {
             <h5>⚠️ Blocked Retirements (reached {results.retirementStreakLength} wins but cap was full)</h5>
           </CCardHeader>
           <CCardBody>
-            {results.blockedRetirements.map((fighter, index) => (
+            {results.blockedRetirements.map((fighter) => (
               <p key={fighter.name} className="mb-1">
                 {fighter.name} (Level {fighter.level}) - {fighter.longestStreak} win streak, {fighter.totalFights} total fights
               </p>
@@ -155,6 +158,7 @@ export default function SimulationResults({ results }) {
                 <CTableHeaderCell>W/L/S</CTableHeaderCell>
                 <CTableHeaderCell>Win Rate</CTableHeaderCell>
                 <CTableHeaderCell>Unlucky %</CTableHeaderCell>
+                <CTableHeaderCell>Lucky %</CTableHeaderCell>
                 <CTableHeaderCell>Time</CTableHeaderCell>
                 <CTableHeaderCell>Status</CTableHeaderCell>
               </CTableRow>
@@ -176,15 +180,11 @@ export default function SimulationResults({ results }) {
                   <CTableDataCell>{formatWinLossRecord(fighter)}</CTableDataCell>
                   <CTableDataCell>{formatPercentage(fighter.winRate)}</CTableDataCell>
                   <CTableDataCell>{formatPercentage(fighter.unluckyPercentage)}</CTableDataCell>
+                  <CTableDataCell>{formatPercentage(fighter.luckyPercentage)}</CTableDataCell>
                   <CTableDataCell>{formatTime(fighter.timeInPit)}</CTableDataCell>
                   <CTableDataCell>
                     {fighter.isRetired && (
                       <span className="text-success">RETIRED@{formatTime(fighter.retiredAt)}</span>
-                    )}
-                    {fighter.efficiency !== null && (
-                      <small className="text-muted d-block">
-                        Eff: {fighter.efficiency.toFixed(1)}%
-                      </small>
                     )}
                   </CTableDataCell>
                 </CTableRow>
@@ -256,6 +256,7 @@ export default function SimulationResults({ results }) {
                 <CTableHeaderCell>Streak</CTableHeaderCell>
                 <CTableHeaderCell>W/L/S</CTableHeaderCell>
                 <CTableHeaderCell>Unlucky %</CTableHeaderCell>
+                <CTableHeaderCell>Lucky %</CTableHeaderCell>
                 <CTableHeaderCell>Total Fights</CTableHeaderCell>
                 <CTableHeaderCell>Status</CTableHeaderCell>
               </CTableRow>
@@ -272,6 +273,7 @@ export default function SimulationResults({ results }) {
                   <CTableDataCell>{fighter.longestStreak}</CTableDataCell>
                   <CTableDataCell>{formatWinLossRecord(fighter)}</CTableDataCell>
                   <CTableDataCell>{fighter.unluckyPercentage}</CTableDataCell>
+                  <CTableDataCell>{fighter.luckyPercentage}</CTableDataCell>
                   <CTableDataCell>{fighter.totalFights}</CTableDataCell>
                   <CTableDataCell>
                     {fighter.isRetired && (
@@ -299,7 +301,7 @@ export default function SimulationResults({ results }) {
           <CRow>
             <CCol md={6}>
               <p><strong>Total Fights:</strong> {results.totalFights}</p>
-              <p><strong>Total Simuls:</strong> {results.totalSimuls} ({formatPercentage(results.totalSimuls / results.totalFights)})</p>
+              <p><strong>Total Simuls:</strong> {results.totalSimuls} ({formatPercentage(results.totalSimuls / results.totalFights * 100)})</p>
               <p><strong>Round Duration:</strong> {results.roundDuration} minutes</p>
             </CCol>
             <CCol md={6}>

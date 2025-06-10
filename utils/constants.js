@@ -5,7 +5,7 @@ export const DEFAULT_CONFIG = {
   skillMultiplier: 3.0,
   fatigueMultiplier: 0.001,
   useShortestQueue: false,
-  baseSimulChance: 0.15,
+  baseSimulChance: 0.20,
   simulReductionPerLevel: 0.015,
   averageFightDurationSeconds: 30,
   fightDurationVariance: 10,
