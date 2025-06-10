@@ -16,6 +16,7 @@ import { tournamentLogger } from '../../lib/tournament-simulator.js';
 export default function LogModal() {
   const [logs, setLogs] = useState([]);
   const [isVisible, setIsVisible] = useState(false);
+  const [logCount, setLogCount] = useState(0);
 
   // Handle log updates from the tournament logger
   const handleLogUpdate = useCallback((logEntry, action) => {
