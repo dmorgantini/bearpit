@@ -13,7 +13,7 @@ import {
   CCol,
   CBadge
 } from '@coreui/react';
-import { distributions } from '../../lib/distributions.js';
+import { distributions } from '../../../lib/distributions.js';
 
 export default function FighterConfig({ fighters, onFightersChange }) {
   const [selectedDistribution, setSelectedDistribution] = useState('');
