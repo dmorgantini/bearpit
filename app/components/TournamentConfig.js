@@ -13,19 +13,44 @@ import {
   CFormSelect,
   CRow
 } from '@coreui/react';
-import {DEFAULT_CONFIG} from '../../utils/constants.js';
+import {DEFAULT_CONFIG, SINGLE_SHORT_CONFIG, SWORD_AND_BOARD_CONFIG, FLO_CONFIG} from '../../utils/constants.js';
 import FighterConfig from './FighterConfig.jsx';
 
 function TournamentConfig({onConfigChange, onRunTournament}) {
   const [config, setConfig] = useState(DEFAULT_CONFIG);
+  const [category, setCategory] = useState('default');
   const [fighters, setFighters] = useState([
-    {name: 'Fighter1', level: 3},
-    {name: 'Fighter2', level: 2},
-    {name: 'Fighter3', level: 1},
+    {name: 'Fighter1', level: 4},
+    {name: 'Fighter2', level: 3},
+    {name: 'Fighter3', level: 2},
+    {name: 'Fighter4', level: 1},
   ]);
 
   const handleConfigChange = (field, value) => {
     const newConfig = {...config, [field]: value};
+    setConfig(newConfig);
+    onConfigChange?.(newConfig);
+  };
+
+  const handleCategoryChange = (selectedCategory) => {
+    setCategory(selectedCategory);
+    let categoryConfig;
+    
+    switch (selectedCategory) {
+      case 'single-short':
+        categoryConfig = SINGLE_SHORT_CONFIG;
+        break;
+      case 'sword-board':
+        categoryConfig = SWORD_AND_BOARD_CONFIG;
+        break;
+      case 'flo':
+        categoryConfig = FLO_CONFIG;
+        break;
+      default:
+        categoryConfig = DEFAULT_CONFIG;
+    }
+    
+    const newConfig = {...config, ...categoryConfig};
     setConfig(newConfig);
     onConfigChange?.(newConfig);
   };
@@ -116,6 +141,18 @@ function TournamentConfig({onConfigChange, onRunTournament}) {
                 >
                   <option value="false">Shared Queue</option>
                   <option value="true">Shortest Queue per Pit</option>
+                </CFormSelect>
+              </CCol>
+              <CCol md={6}>
+                <CFormLabel>Category</CFormLabel>
+                <CFormSelect
+                  value={category}
+                  onChange={(e) => handleCategoryChange(e.target.value)}
+                >
+                  <option value="default">Default</option>
+                  <option value="single-short">Single Short</option>
+                  <option value="sword-board">Sword & Board</option>
+                  <option value="flo">Flo</option>
                 </CFormSelect>
               </CCol>
             </CRow>
@@ -228,6 +265,17 @@ function TournamentConfig({onConfigChange, onRunTournament}) {
               </CRow>
               <CRow className="mb-3">
                 <CCol md={6}>
+                  <CFormLabel>Variance Per Level Diff (seconds)</CFormLabel>
+                  <CFormInput
+                    type="number"
+                    min="0"
+                    max="10"
+                    value={config.fightDurationVariancePerLevel}
+                    onChange={(e) => handleConfigChange('fightDurationVariancePerLevel', parseInt(e.target.value))}
+                  />
+                  <small className="text-muted">Extra variance per level difference</small>
+                </CCol>
+                <CCol md={6}>
                   <CFormLabel>Base Simul Chance (%)</CFormLabel>
                   <CFormInput
                     type="number"
@@ -238,6 +286,8 @@ function TournamentConfig({onConfigChange, onRunTournament}) {
                     onChange={(e) => handleConfigChange('baseSimulChance', parseInt(e.target.value) / 100)}
                   />
                 </CCol>
+              </CRow>
+              <CRow className="mb-3">
                 <CCol md={6}>
                   <CFormLabel>Simul % Decrease Per Level</CFormLabel>
                   <CFormInput
