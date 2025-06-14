@@ -7,7 +7,7 @@ import {
   CButton,
   CRow,
   CCol,
-  CFormCheck
+  CSpinner
 } from '@coreui/react';
 import { distributions } from '../../../lib/distributions.js';
 import { DEFAULT_CONFIG } from '../../../utils/constants.js';
@@ -24,7 +24,7 @@ const ANALYZER_CONFIG = {
   iterations: 25
 };
 
-export default function FairnessAnalyzerConfig({ onRunAnalysis }) {
+export default function FairnessAnalyzerConfig({ onRunAnalysis, disabled = false }) {
   const [analyzerConfig, setAnalyzerConfig] = useState(ANALYZER_CONFIG);
   const [tournamentConfig, setTournamentConfig] = useState(DEFAULT_CONFIG);
   const [category, setCategory] = useState('default');
@@ -60,6 +60,7 @@ export default function FairnessAnalyzerConfig({ onRunAnalysis }) {
             max="60"
             value={analyzerConfig.fighterCount}
             onChange={(e) => handleAnalyzerConfigChange('fighterCount', parseInt(e.target.value))}
+            disabled={disabled}
           />
         </CCol>
         <CCol md={6}>
@@ -67,6 +68,7 @@ export default function FairnessAnalyzerConfig({ onRunAnalysis }) {
           <CFormSelect
             value={analyzerConfig.distribution}
             onChange={(e) => handleAnalyzerConfigChange('distribution', e.target.value)}
+            disabled={disabled}
           >
             {distributions.map(dist => (
               <option key={dist.name} value={dist.name}>{dist.name}</option>
@@ -84,6 +86,7 @@ export default function FairnessAnalyzerConfig({ onRunAnalysis }) {
             onChange={(e) => handleAnalyzerConfigChange('timeOptions', 
               e.target.value.split(',').map(t => parseInt(t.trim())))}
             placeholder="10, 15, 20, 25"
+            disabled={disabled}
           />
         </CCol>
         <CCol md={6}>
@@ -94,6 +97,7 @@ export default function FairnessAnalyzerConfig({ onRunAnalysis }) {
             onChange={(e) => handleAnalyzerConfigChange('pitOptions',
               e.target.value.split(',').map(p => parseInt(p.trim())))}
             placeholder="1, 2, 3, 4"
+            disabled={disabled}
           />
         </CCol>
       </CRow>
@@ -107,6 +111,7 @@ export default function FairnessAnalyzerConfig({ onRunAnalysis }) {
             max="100"
             value={analyzerConfig.iterations}
             onChange={(e) => handleAnalyzerConfigChange('iterations', parseInt(e.target.value))}
+            disabled={disabled}
           />
         </CCol>
       </CRow>
@@ -116,21 +121,31 @@ export default function FairnessAnalyzerConfig({ onRunAnalysis }) {
         category={category}
         onConfigChange={handleTournamentConfigChange} 
         onCategoryChange={handleCategoryChange}
+        disabled={disabled}
       />
 
       <TournamentModeSettings 
         config={tournamentConfig} 
-        onConfigChange={handleTournamentConfigChange} 
+        onConfigChange={handleTournamentConfigChange}
+        disabled={disabled}
       />
 
       <AdvancedSettings 
         config={tournamentConfig} 
-        onConfigChange={handleTournamentConfigChange} 
+        onConfigChange={handleTournamentConfigChange}
+        disabled={disabled}
       />
 
       <div className="d-grid">
-        <CButton type="submit" color="primary" size="lg">
-          🔍 Run Fairness Analysis
+        <CButton type="submit" color="primary" size="lg" disabled={disabled}>
+          {disabled ? (
+            <>
+              <CSpinner size="sm" className="me-2" />
+              Running Analysis...
+            </>
+          ) : (
+            '🔍 Run Fairness Analysis'
+          )}
         </CButton>
       </div>
     </CForm>
