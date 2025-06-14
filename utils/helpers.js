@@ -1,10 +1,3 @@
-
-import { DEFAULT_CONFIG } from './constants.js';
-
-export function mergeConfig(userConfig = {}) {
-  return { ...DEFAULT_CONFIG, ...userConfig };
-}
-
 export const generateFightersFromDistribution = (count, distribution) => {
   const newFighters = [];
   let currentIndex = 0;

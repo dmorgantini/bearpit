@@ -8,7 +8,9 @@ import {
   CRow
 } from '@coreui/react';
 
-function BasicSettings({ config, fighters, onConfigChange }) {
+function BasicSettings({ config, fighterCount, onConfigChange }) {
+  const maxPits = Math.floor(fighterCount / 2);
+
   return (
     <CRow className="mb-3">
       <CCol md={6}>
@@ -16,12 +18,12 @@ function BasicSettings({ config, fighters, onConfigChange }) {
         <CFormInput
           type="number"
           min="1"
-          max={Math.floor(fighters.length / 2)}
+          max={maxPits}
           value={config.numberOfPits}
           onChange={(e) => onConfigChange('numberOfPits', parseInt(e.target.value))}
         />
         <small className="text-muted">
-          Max: {Math.floor(fighters.length / 2)} for {fighters.length} fighters
+          Max: {maxPits} for {fighterCount} fighters
         </small>
       </CCol>
       <CCol md={6}>

@@ -25,7 +25,7 @@ function TournamentConfigForm({
     <CForm onSubmit={onSubmit}>
       <BasicSettings 
         config={config} 
-        fighters={fighters} 
+        fighterCount={fighters.length}
         onConfigChange={onConfigChange} 
       />
 
