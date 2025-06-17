@@ -3,7 +3,8 @@
 import React from 'react';
 import {
   CButton,
-  CForm
+  CForm,
+  CAlert
 } from '@coreui/react';
 import BasicSettings from './BasicSettings.jsx';
 import CombatSettings from './CombatSettings.jsx';
@@ -19,10 +20,21 @@ function TournamentConfigForm({
   onCategoryChange,
   onFightersChange,
   onSubmit,
-  isValid 
+  isValid,
+  errors = []
 }) {
   return (
     <CForm onSubmit={onSubmit}>
+      {errors.length > 0 && (
+        <div className="mb-3">
+          {errors.map((error, index) => (
+            <CAlert key={index} color="danger" className="mb-2">
+              ❌ {error}
+            </CAlert>
+          ))}
+        </div>
+      )}
+
       <BasicSettings 
         config={config} 
         fighterCount={fighters.length}

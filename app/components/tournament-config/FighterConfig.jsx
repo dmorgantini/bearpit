@@ -118,7 +118,10 @@ export default function FighterConfig({ fighters, onFightersChange }) {
                 min="1"
                 max="100"
                 value={fighterCount}
-                onChange={(e) => setFighterCount(parseInt(e.target.value) || 0)}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  setFighterCount(value === '' ? '' : parseInt(value) || 0);
+                }}
               />
             </CCol>
             <CCol md={5}>
@@ -207,7 +210,10 @@ export default function FighterConfig({ fighters, onFightersChange }) {
                       min="1"
                       max="10"
                       value={fighter.level}
-                      onChange={(e) => handleFighterChange(index, 'level', parseInt(e.target.value) || 1)}
+                      onChange={(e) => {
+                        const value = e.target.value;
+                        handleFighterChange(index, 'level', value === '' ? '' : parseInt(value) || 1);
+                      }}
                     />
                   </CCol>
                   <CCol md={2}>

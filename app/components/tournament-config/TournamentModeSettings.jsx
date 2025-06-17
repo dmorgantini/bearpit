@@ -1,4 +1,3 @@
-
 'use client';
 
 import React from 'react';
@@ -9,13 +8,17 @@ import {
   CFormSelect,
   CRow
 } from '@coreui/react';
+import InfoButton from '../common/InfoButton';
 
 function TournamentModeSettings({ config, onConfigChange }) {
   return (
     <>
       <CRow className="mb-3">
         <CCol md={12}>
-          <CFormLabel>Tournament Mode</CFormLabel>
+          <CFormLabel className="d-flex align-items-center">
+            <span style={{ minWidth: '120px' }}>Tournament Mode</span>
+            <InfoButton description="Traditional: Fighters compete for the longest win streak. Retirement Race: Fighters retire after reaching a target win streak, with a limited number of retirement slots available." />
+          </CFormLabel>
           <CFormSelect
             value={config.retirementStreakLength || ''}
             onChange={(e) => {
@@ -39,13 +42,19 @@ function TournamentModeSettings({ config, onConfigChange }) {
         <CCol md={6}>
           {config.retirementStreakLength && (
             <>
-              <CFormLabel>Max Retirements</CFormLabel>
+              <CFormLabel className="d-flex align-items-center">
+                <span style={{ minWidth: '120px' }}>Max Retirements</span>
+                <InfoButton description="The maximum number of fighters that can retire in the tournament. Once this limit is reached, other fighters who reach the target streak will be blocked from retiring." />
+              </CFormLabel>
               <CFormInput
                 type="number"
                 min="1"
                 max="10"
                 value={config.maxRetirements}
-                onChange={(e) => onConfigChange('maxRetirements', parseInt(e.target.value))}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  onConfigChange('maxRetirements', value === '' ? '' : parseInt(value));
+                }}
               />
             </>
           )}

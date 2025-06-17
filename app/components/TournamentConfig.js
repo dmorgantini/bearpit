@@ -38,7 +38,6 @@ function TournamentConfig({ onConfigChange, onRunTournament }) {
     e.preventDefault();
 
     if (!isValid) {
-      alert('Configuration errors:\n' + errors.join('\n'));
       return;
     }
 
@@ -66,6 +65,7 @@ function TournamentConfig({ onConfigChange, onRunTournament }) {
             onFightersChange={handleFightersChange}
             onSubmit={handleSubmit}
             isValid={isValid}
+            errors={errors}
           />
         </CCardBody>
       </CCard>
