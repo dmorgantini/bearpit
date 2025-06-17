@@ -1,5 +1,4 @@
 import React from 'react';
-import LogModal from "./LogModal.jsx";
 import EmptyResults from './simulation-results/EmptyResults';
 import TournamentWinner from './simulation-results/TournamentWinner';
 import RetirementResults from './simulation-results/RetirementResults';
@@ -17,7 +16,6 @@ export default function SimulationResults({ results }) {
 
   return (
     <div>
-      <LogModal />
       <TournamentWinner results={results} />
       <RetirementResults results={results} />
       <BlockedRetirements results={results} />

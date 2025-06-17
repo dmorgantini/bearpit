@@ -10,7 +10,6 @@ import {
 } from '@coreui/react';
 import FairnessAnalyzerConfig from './fairness-analyzer/FairnessAnalyzerConfig.jsx';
 import FairnessAnalyzerResults from './fairness-analyzer/FairnessAnalyzerResults.jsx';
-import LogModal from './LogModal.jsx';
 
 export default function FairnessAnalyzerTab({ onRunAnalysis, isRunning, results }) {
   const [showLogs, setShowLogs] = useState(false);
@@ -49,11 +48,6 @@ export default function FairnessAnalyzerTab({ onRunAnalysis, isRunning, results 
           </CCard>
         </CCol>
       </CRow>
-
-      <LogModal
-        show={showLogs}
-        onClose={() => setShowLogs(false)}
-      />
     </div>
   );
 } 

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   CCard,
   CCardBody,
@@ -11,10 +11,24 @@ import {
   CTableDataCell,
   CBadge,
   CRow,
-  CCol
+  CCol,
+  CModal,
+  CModalHeader,
+  CModalTitle,
+  CModalBody,
+  CModalFooter,
+  CButton
 } from '@coreui/react';
+import InfoButton from '../common/InfoButton';
+import { FairnessCalculator } from '../../../lib/fairness-calculator';
+import DetailedMetricsModal from './DetailedMetricsModal';
 
 export default function FairnessAnalyzerResults({ results }) {
+  const [showScoreModal, setShowScoreModal] = useState(false);
+  const [showMetricsModal, setShowMetricsModal] = useState(false);
+  const [selectedScore, setSelectedScore] = useState(null);
+  const [selectedResult, setSelectedResult] = useState(null);
+
   if (!results) {
     return (
       <CCard>
@@ -39,121 +53,35 @@ export default function FairnessAnalyzerResults({ results }) {
     return 'danger';
   };
 
+  const handleScoreClick = (result) => {
+    setSelectedScore(result);
+    setShowScoreModal(true);
+  };
+
+  const handleRowClick = (result) => {
+    setSelectedResult(result);
+    setShowMetricsModal(true);
+  };
+
+  const renderScoreExplanation = (result) => {
+    if (!result) return null;
+    const explanations = FairnessCalculator.generateScoreExplanation(result.averageMetrics, FairnessCalculator.calculateFairnessScores(result.averageMetrics));
+    
+    return (
+      <div>
+        {Object.entries(explanations).map(([key, explanation]) => (
+          <div key={key} className="mb-3">
+            <h6 className="text-capitalize">{key}</h6>
+            <p><strong>Score:</strong> {explanation.score.toFixed(1)} ({explanation.impact})</p>
+            <p>{explanation.description}</p>
+          </div>
+        ))}
+      </div>
+    );
+  };
+
   return (
     <div>
-      {/* Top Configurations */}
-      <CCard className="mb-3">
-        <CCardHeader>
-          <h4>🏆 Top Configurations</h4>
-        </CCardHeader>
-        <CCardBody>
-          <CTable striped hover>
-            <CTableHead>
-              <CTableRow>
-                <CTableHeaderCell>Rank</CTableHeaderCell>
-                <CTableHeaderCell>Configuration</CTableHeaderCell>
-                <CTableHeaderCell>Score</CTableHeaderCell>
-                <CTableHeaderCell>Fight Distribution CV</CTableHeaderCell>
-                <CTableHeaderCell>Skill-Win Correlation</CTableHeaderCell>
-                <CTableHeaderCell>Total Fights</CTableHeaderCell>
-                <CTableHeaderCell>Fights/Fighter</CTableHeaderCell>
-              </CTableRow>
-            </CTableHead>
-            <CTableBody>
-              {results.slice(0, 5).map((result, index) => (
-                <CTableRow key={index}>
-                  <CTableDataCell>{index + 1}</CTableDataCell>
-                  <CTableDataCell>
-                    {result.configuration.time}min, {result.configuration.pits} pit(s),{' '}
-                    {result.configuration.useShortestQueue ? 'shortest' : 'shared'} queue
-                  </CTableDataCell>
-                  <CTableDataCell>
-                    <CBadge color={getScoreColor(result.optimizedScore)}>
-                      {result.optimizedScore.toFixed(1)}
-                    </CBadge>
-                  </CTableDataCell>
-                  <CTableDataCell>
-                    <CBadge color={getCVColor(result.averageMetrics.fightDistribution.fightDistributionCV)}>
-                      {result.averageMetrics.fightDistribution.fightDistributionCV.toFixed(3)}
-                    </CBadge>
-                  </CTableDataCell>
-                  <CTableDataCell>
-                    {result.averageMetrics.competitiveBalance.skillWinCorrelation.toFixed(3)}
-                  </CTableDataCell>
-                  <CTableDataCell>
-                    {result.averageMetrics.rawStats.totalFights.toFixed(1)}
-                  </CTableDataCell>
-                  <CTableDataCell>
-                    {result.averageMetrics.fightDistribution.avgFightsPerFighter.toFixed(1)}
-                  </CTableDataCell>
-                </CTableRow>
-              ))}
-            </CTableBody>
-          </CTable>
-        </CCardBody>
-      </CCard>
-
-      {/* Detailed Metrics for Top Configuration */}
-      {results[0] && (
-        <CCard className="mb-3">
-          <CCardHeader>
-            <h4>📊 Detailed Metrics for Best Configuration</h4>
-          </CCardHeader>
-          <CCardBody>
-            <CRow>
-              <CCol md={6}>
-                <h5>Fight Distribution</h5>
-                <p>
-                  <strong>CV:</strong>{' '}
-                  <CBadge color={getCVColor(results[0].averageMetrics.fightDistribution.fightDistributionCV)}>
-                    {results[0].averageMetrics.fightDistribution.fightDistributionCV.toFixed(3)}
-                  </CBadge>
-                </p>
-                <p><strong>Avg Fights/Fighter:</strong> {results[0].averageMetrics.fightDistribution.avgFightsPerFighter.toFixed(1)}</p>
-                <p><strong>Fight Range:</strong> {results[0].averageMetrics.fightDistribution.minFights.toFixed(0)}-{results[0].averageMetrics.fightDistribution.maxFights.toFixed(0)}</p>
-                <p><strong>Fights per Minute:</strong> {results[0].averageMetrics.fightDistribution.avgFightsPerMinute.toFixed(1)}</p>
-              </CCol>
-              <CCol md={6}>
-                <h5>Competitive Balance</h5>
-                <p><strong>Skill-Win Correlation:</strong> {results[0].averageMetrics.competitiveBalance.skillWinCorrelation.toFixed(3)}</p>
-                <p><strong>Unlucky Fighter Rate:</strong> {(results[0].averageMetrics.competitiveBalance.unluckyFighterRate * 100).toFixed(1)}%</p>
-                <p><strong>Total Fights:</strong> {results[0].averageMetrics.rawStats.totalFights.toFixed(1)}</p>
-                <p><strong>Simul Rate:</strong> {(results[0].averageMetrics.efficiency.simulRate * 100).toFixed(1)}%</p>
-              </CCol>
-            </CRow>
-
-            {results[0].averageMetrics.retirement && (
-              <CRow className="mt-3">
-                <CCol md={6}>
-                  <h5>Retirement Metrics</h5>
-                  <p><strong>Retirement Success:</strong> {(results[0].averageMetrics.retirement.retirementSuccess * 100).toFixed(1)}%</p>
-                  <p><strong>Retired Count:</strong> {results[0].averageMetrics.retirement.retiredCount.toFixed(1)}/{results[0].averageMetrics.retirement.maxRetirements}</p>
-                  {results[0].averageMetrics.retirement.averageRetirementTime && (
-                    <p><strong>Avg Retirement Time:</strong> {results[0].averageMetrics.retirement.averageRetirementTime.toFixed(1)} minutes</p>
-                  )}
-                </CCol>
-              </CRow>
-            )}
-
-            <CRow className="mt-3">
-              <CCol>
-                <h5>Realism Flags</h5>
-                {Object.entries(results[0].averageMetrics.realism)
-                  .filter(([_, value]) => value > 0.5)
-                  .map(([key, value]) => (
-                    <p key={key}>
-                      <strong>{key}:</strong>{' '}
-                      <CBadge color="warning">
-                        {(value * 100).toFixed(1)}%
-                      </CBadge>
-                    </p>
-                  ))}
-              </CCol>
-            </CRow>
-          </CCardBody>
-        </CCard>
-      )}
-
       {/* Configuration Comparison */}
       <CCard>
         <CCardHeader>
@@ -163,23 +91,55 @@ export default function FairnessAnalyzerResults({ results }) {
           <CTable striped hover size="sm">
             <CTableHead>
               <CTableRow>
-                <CTableHeaderCell>Time</CTableHeaderCell>
-                <CTableHeaderCell>Pits</CTableHeaderCell>
-                <CTableHeaderCell>Queue</CTableHeaderCell>
-                <CTableHeaderCell>Score</CTableHeaderCell>
-                <CTableHeaderCell>CV</CTableHeaderCell>
-                <CTableHeaderCell>Fights</CTableHeaderCell>
-                <CTableHeaderCell>Fights/Fighter</CTableHeaderCell>
+                <CTableHeaderCell>
+                  Time
+                  <InfoButton description="Duration of the tournament in minutes" />
+                </CTableHeaderCell>
+                <CTableHeaderCell>
+                  Pits
+                  <InfoButton description="Number of fighting pits available" />
+                </CTableHeaderCell>
+                <CTableHeaderCell>
+                  Queue
+                  <InfoButton description="Queue strategy: Shortest or Shared" />
+                </CTableHeaderCell>
+                <CTableHeaderCell>
+                  Score
+                  <InfoButton description="Overall fairness score combining multiple metrics (click for details)" />
+                </CTableHeaderCell>
+                <CTableHeaderCell>
+                  CV
+                  <InfoButton description="Coefficient of variation in fight distribution - lower is better" />
+                </CTableHeaderCell>
+                <CTableHeaderCell>
+                  Fights
+                  <InfoButton description="Total number of fights completed" />
+                </CTableHeaderCell>
+                <CTableHeaderCell>
+                  Fights/Fighter
+                  <InfoButton description="Average number of fights per fighter" />
+                </CTableHeaderCell>
               </CTableRow>
             </CTableHead>
             <CTableBody>
               {results.map((result, index) => (
-                <CTableRow key={index}>
+                <CTableRow 
+                  key={index}
+                  style={{ cursor: 'pointer' }}
+                  onClick={() => handleRowClick(result)}
+                >
                   <CTableDataCell>{result.configuration.time}min</CTableDataCell>
                   <CTableDataCell>{result.configuration.pits}</CTableDataCell>
                   <CTableDataCell>{result.configuration.useShortestQueue ? 'Shortest' : 'Shared'}</CTableDataCell>
                   <CTableDataCell>
-                    <CBadge color={getScoreColor(result.optimizedScore)}>
+                    <CBadge 
+                      color={getScoreColor(result.optimizedScore)}
+                      style={{ cursor: 'pointer' }}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleScoreClick(result);
+                      }}
+                    >
                       {result.optimizedScore.toFixed(1)}
                     </CBadge>
                   </CTableDataCell>
@@ -196,6 +156,28 @@ export default function FairnessAnalyzerResults({ results }) {
           </CTable>
         </CCardBody>
       </CCard>
+
+      {/* Score Explanation Modal */}
+      <CModal visible={showScoreModal} onClose={() => setShowScoreModal(false)} size="lg">
+        <CModalHeader onClose={() => setShowScoreModal(false)}>
+          <CModalTitle>Score Explanation</CModalTitle>
+        </CModalHeader>
+        <CModalBody>
+          {selectedScore && renderScoreExplanation(selectedScore)}
+        </CModalBody>
+        <CModalFooter>
+          <CButton color="secondary" onClick={() => setShowScoreModal(false)}>
+            Close
+          </CButton>
+        </CModalFooter>
+      </CModal>
+
+      {/* Detailed Metrics Modal */}
+      <DetailedMetricsModal
+        visible={showMetricsModal}
+        onClose={() => setShowMetricsModal(false)}
+        result={selectedResult}
+      />
     </div>
   );
 } 
