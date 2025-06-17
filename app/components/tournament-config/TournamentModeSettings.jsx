@@ -29,7 +29,6 @@ function TournamentModeSettings({ config, onConfigChange }) {
           >
             <option value="">Traditional (longest streak wins)</option>
             <option value="auto">Retirement Race (auto streak)</option>
-            <option value="3">Retirement Race (3 wins)</option>
             <option value="5">Retirement Race (5 wins)</option>
             <option value="7">Retirement Race (7 wins)</option>
             <option value="10">Retirement Race (10 wins)</option>

@@ -27,8 +27,8 @@ function CombatSettings({ config, category, onConfigChange, onCategoryChange }) 
           value={category}
           onChange={(e) => onCategoryChange(e.target.value)}
         >
-          <option value="default">Default</option>
-          <option value="single-short">Single Short</option>
+          <option value="default">Single Short</option>
+          <option value="great">Great</option>
           <option value="sword-board">Sword & Board</option>
           <option value="flo">Flo</option>
         </CFormSelect>

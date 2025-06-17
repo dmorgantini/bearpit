@@ -3,6 +3,10 @@ import { CCard, CCardBody, CCardHeader, CCol, CRow } from '@coreui/react';
 import { formatPercentage } from '../../../utils/helpers.js';
 
 export default function TournamentStatistics({ results }) {
+  // Calculate total streaks and wins across all fighters
+  const totalStreaks = results.fighterStats?.reduce((sum, fighter) => sum + fighter.longestStreak, 0) || 0;
+  const totalWins = results.fighterStats?.reduce((sum, fighter) => sum + fighter.totalWins, 0) || 0;
+
   return (
     <CCard>
       <CCardHeader>
@@ -12,8 +16,9 @@ export default function TournamentStatistics({ results }) {
         <CRow>
           <CCol md={6}>
             <p><strong>Total Fights:</strong> {results.totalFights}</p>
+            <p><strong>Total Streaks:</strong> {totalStreaks}</p>
+            <p><strong>Total Wins:</strong> {totalWins}</p>
             <p><strong>Total Simuls:</strong> {results.totalSimuls} ({formatPercentage(results.totalSimuls / results.totalFights * 100)})</p>
-            <p><strong>Round Duration:</strong> {results.roundDuration} minutes</p>
           </CCol>
           <CCol md={6}>
             {results.retirementStreakLength ? (

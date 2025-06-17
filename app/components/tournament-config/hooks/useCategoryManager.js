@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback } from 'react';
-import { DEFAULT_CONFIG, SINGLE_SHORT_CONFIG, SWORD_AND_BOARD_CONFIG, FLO_CONFIG } from '../../../../utils/constants.js';
+import { DEFAULT_CONFIG, GREAT_CONFIG, SWORD_AND_BOARD_CONFIG, FLO_CONFIG } from '../../../../utils/constants.js';
 
 function useCategoryManager(config, setConfig, onConfigChange) {
   const handleCategoryChange = useCallback((selectedCategory) => {
@@ -9,7 +9,10 @@ function useCategoryManager(config, setConfig, onConfigChange) {
     
     switch (selectedCategory) {
       case 'single-short':
-        categoryConfig = SINGLE_SHORT_CONFIG;
+        categoryConfig = DEFAULT_CONFIG;
+        break;      
+      case 'great':
+        categoryConfig = GREAT_CONFIG;
         break;
       case 'sword-board':
         categoryConfig = SWORD_AND_BOARD_CONFIG;

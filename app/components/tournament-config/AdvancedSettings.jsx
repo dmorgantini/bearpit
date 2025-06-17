@@ -7,6 +7,7 @@ import {
   CFormLabel,
   CRow
 } from '@coreui/react';
+import { FightDurationSettings } from './FightDurationSettings';
 
 function AdvancedSettings({ config, onConfigChange }) {
   return (
@@ -50,40 +51,8 @@ function AdvancedSettings({ config, onConfigChange }) {
           />
         </CCol>
       </CRow>
+      <FightDurationSettings config={config} onConfigChange={onConfigChange} />
       <CRow className="mb-3">
-        <CCol md={6}>
-          <CFormLabel>Average Fight Duration (seconds)</CFormLabel>
-          <CFormInput
-            type="number"
-            min="10"
-            max="120"
-            value={config.averageFightDurationSeconds}
-            onChange={(e) => onConfigChange('averageFightDurationSeconds', parseInt(e.target.value))}
-          />
-        </CCol>
-        <CCol md={6}>
-          <CFormLabel>Fight Duration Variance (seconds)</CFormLabel>
-          <CFormInput
-            type="number"
-            min="0"
-            max="60"
-            value={config.fightDurationVariance}
-            onChange={(e) => onConfigChange('fightDurationVariance', parseInt(e.target.value))}
-          />
-        </CCol>
-      </CRow>
-      <CRow className="mb-3">
-        <CCol md={6}>
-          <CFormLabel>Variance Per Level Diff (seconds)</CFormLabel>
-          <CFormInput
-            type="number"
-            min="0"
-            max="10"
-            value={config.fightDurationVariancePerLevel}
-            onChange={(e) => onConfigChange('fightDurationVariancePerLevel', parseInt(e.target.value))}
-          />
-          <small className="text-muted">Extra variance per level difference</small>
-        </CCol>
         <CCol md={6}>
           <CFormLabel>Base Simul Chance (%)</CFormLabel>
           <CFormInput
@@ -95,8 +64,6 @@ function AdvancedSettings({ config, onConfigChange }) {
             onChange={(e) => onConfigChange('baseSimulChance', parseInt(e.target.value) / 100)}
           />
         </CCol>
-      </CRow>
-      <CRow className="mb-3">
         <CCol md={6}>
           <CFormLabel>Simul % Decrease Per Level</CFormLabel>
           <CFormInput
